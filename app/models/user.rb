@@ -19,12 +19,8 @@ class User < ApplicationRecord
     # if already in use, continue the loop, generating a new token
     # if not in use, return the token
     loop do
-      self.session_token = SecureRandom::urlsafe_base64
-      if (User.exists?)
-        self.session_token = SecureRandom::urlsafe_base64
-      else
-        return session_token
-      end
+      session_token = SecureRandom::urlsafe_base64
+      return session_token if !User.exists?(session_token: session_token)
     end
 
   end
@@ -32,7 +28,7 @@ class User < ApplicationRecord
   def ensure_session_token
     # if `self.session_token` is already present, leave it be
     # if `self.session_token` is nil, set it to `generate_unique_session_token`
-    self.session_token ||= SecureRandom::urlsafe_base64
+    self.session_token ||= generate_unique_session_token
   end
 
 
